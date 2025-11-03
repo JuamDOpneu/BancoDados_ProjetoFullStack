@@ -2,20 +2,29 @@ package com.example.memorygame.repository
 
 import com.example.memorygame.model.MemoryCard
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query // <-- Importação necessária
 import org.springframework.stereotype.Repository
 
 @Repository
 interface MemoryCardRepository : JpaRepository<MemoryCard, Long> {
 
     /**
-     * Requisito: Fazer uma consulta (por nome, valor, etc).
-     * O Spring Data JPA entende o nome dessa função e cria a consulta
-     * "SELECT * FROM memory_cards WHERE theme LIKE '%?%'".
+     * Requisito: Fazer uma consulta (por tema)
+     * Busca cartas onde o tema é EXATAMENTE IGUAL, ignorando maiúsculas.
      */
-    fun findByThemeContainingIgnoreCase(theme: String): List<MemoryCard>
+    fun findByThemeIgnoreCase(theme: String): List<MemoryCard>
 
     /**
-     * Consulta extra para o filtro por nome.
+     * Requisito: Fazer uma consulta (por nome)
+     * Busca cartas onde o nome CONTÉM o texto, ignorando maiúsculas.
      */
     fun findByNameContainingIgnoreCase(name: String): List<MemoryCard>
+
+    /**
+     * Funcionalidade Extra: Buscar Temas Únicos
+     * Usa uma consulta JPQL customizada para retornar apenas a lista
+     * de nomes de temas distintos (ex: ["Pokémon", "Animais"]).
+     */
+    @Query("SELECT DISTINCT m.theme FROM MemoryCard m")
+    fun findDistinctThemes(): List<String> // <-- Retorna Lista de Strings
 }

@@ -15,4 +15,5 @@ interface CardService {
     fun save(card: MemoryCard): MemoryCard
     fun update(id: Long, card: MemoryCard): MemoryCard?
     fun delete(id: Long): Boolean
+    fun findDistinctThemes(): List<String>
 }

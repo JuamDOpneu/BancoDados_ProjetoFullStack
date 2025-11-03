@@ -27,6 +27,10 @@ class MemoryCardController(
         println("pegar cartas")
         return cardService.search(name, theme)
     }
+    @GetMapping("/themes")
+    fun getDistinctThemes(): List<String> {
+        return cardService.findDistinctThemes()
+    }
 
     /**
      * Requisito: Salvar entidade.

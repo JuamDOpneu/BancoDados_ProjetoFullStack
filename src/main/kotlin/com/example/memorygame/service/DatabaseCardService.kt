@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class DatabaseCardService(
-    private val repository: MemoryCardRepository // Injeção de dependência do Repository
+    private val repository: MemoryCardRepository // Injeção de dependência
 ) : CardService { // Implementa a interface
 
     override fun findAll(): List<MemoryCard> = repository.findAll()
@@ -19,7 +19,11 @@ class DatabaseCardService(
     override fun search(name: String?, theme: String?): List<MemoryCard> {
         return when {
             !name.isNullOrBlank() -> repository.findByNameContainingIgnoreCase(name)
-            !theme.isNullOrBlank() -> repository.findByThemeContainingIgnoreCase(theme)
+
+            // ✅ A CORREÇÃO ESTÁ AQUI:
+            // Trocamos 'findByThemeContainingIgnoreCase' pelo novo nome 'findByThemeIgnoreCase'
+            !theme.isNullOrBlank() -> repository.findByThemeIgnoreCase(theme)
+
             else -> repository.findAll()
         }
     }
@@ -33,13 +37,10 @@ class DatabaseCardService(
      * Requisito: Editar entidade
      */
     override fun update(id: Long, card: MemoryCard): MemoryCard? {
-        // Verifica se o card com esse ID existe
         if (!repository.existsById(id)) {
             return null
         }
 
-        // Cria uma nova instância com os dados do 'card' (que veio do front)
-        // e atribui o ID correto para garantir que o 'save' faça um UPDATE.
         val cardToUpdate = MemoryCard(
             name = card.name,
             theme = card.theme,
@@ -61,5 +62,12 @@ class DatabaseCardService(
         } else {
             false
         }
+    }
+
+    /**
+     * Funcionalidade Extra: Buscar Temas Únicos
+     */
+    override fun findDistinctThemes(): List<String> {
+        return repository.findDistinctThemes()
     }
 }
